@@ -26,17 +26,5 @@ import {
   hotel_tvn_sources,
 } from '.';
 
-export const sources = [
-  // ...fanmingming_live_sources,
-  // ...yuechan_live_sources,
-  // ...cymz6_lives_sources,
-  // ...yang_m3u_sources,
-  // ...joevess_iptv_sources,
-  // ...iptv_org_sources,
-  // ...iptv_org_stream_sources,
-  ...hotel_tvn_sources,
-  ...epg_pw_sources,
-  // ...qwerttvv_bj_iptv_sources,
-  ...youhun_sources,
-  // ...zbds_sources,
-];
+// EPG-only 部署：关闭所有直播源抓取，仅保留 EPG 生成
+export const sources = [];

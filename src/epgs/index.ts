@@ -2,11 +2,8 @@
 import type { TEPGSource } from './utils';
 
 export const epgs_sources: TEPGSource[] = [
-  // {
-  //     name: "112114.xyz",
-  //     f_name: "112114_xyz",
-  //     url: "https://epg.112114.xyz/pp.xml",
-  // },
+  // 112114 原始源（epg.112114.xyz）在 Cloudflare 海外构建环境不可达，
+  // 其 GitHub 镜像又为陈旧快照（2025-11），故不纳入。主源改用 51zmt 海外镜像（实时）。
   // {
   //     name: "fanmingming/live",
   //     f_name: "fmml",
