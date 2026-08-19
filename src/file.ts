@@ -179,3 +179,26 @@ const cleanDir = (p: string) => {
 };
 
 export const cleanFiles = () => cleanDir(path.join(projectRoot, 'm3u'));
+
+// 为 TVBox 的频道别名（如 m3u 里的 CETV1）额外生成一份与真实频道同内容的 JSON，
+// 让 TVBox 用原名请求时也能命中节目单。aliases: { 别名: 真实频道名 }
+export const generateEpgAlias = (aliases: Record<string, string>) => {
+  const epgDir = path.join(projectRoot, 'm3u', 'epg');
+  if (!fs.existsSync(epgDir)) return;
+  for (const provider of fs.readdirSync(epgDir)) {
+    const pdir = path.join(epgDir, provider);
+    if (!fs.statSync(pdir).isDirectory()) continue;
+    for (const date of fs.readdirSync(pdir)) {
+      const ddir = path.join(pdir, date);
+      if (!fs.statSync(ddir).isDirectory()) continue;
+      for (const [alias, real] of Object.entries(aliases)) {
+        const realPath = path.join(ddir, real + '.json');
+        const aliasPath = path.join(ddir, alias + '.json');
+        if (fs.existsSync(realPath) && !fs.existsSync(aliasPath)) {
+          fs.copyFileSync(realPath, aliasPath);
+          console.log(`[ALIAS] ${provider}/${date}/${alias}.json <- ${real}.json`);
+        }
+      }
+    }
+  }
+};
