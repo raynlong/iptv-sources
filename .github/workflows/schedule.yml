@@ -46,8 +46,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
       - run: pnpm install
-      - run: pnpm build
-      - run: pnpm m3u
+      - run: pnpm build:static
       - run: sudo apt-get install -y tree
 
       - name: Publish m3u (Cloudflare direct upload or empty commit)
