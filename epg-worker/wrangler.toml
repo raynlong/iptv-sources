@@ -1,0 +1,18 @@
+name = "epg-worker"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# 自定义域名：epg.raynhome.top 由本 Worker 接管（替代原 Pages 静态托管）
+routes = [
+  { pattern = "epg.raynhome.top/*", zone_name = "raynhome.top" }
+]
+
+# Cron：每 2 小时抓取上游 EPG XML 写入 R2（CF 侧调度，不依赖 GitHub Actions）
+[triggers]
+crons = ["0 */2 * * *"]
+
+# R2 存储 EPG JSON（免费额度：10GB 存储 / 100万次写/月，完全够用）
+[[r2_buckets]]
+binding = "EPG_BUCKET"
+bucket_name = "epg-data"
