@@ -196,13 +196,24 @@ async function refreshEpg(env) {
     })
   );
 
+  // 记录本次运行状态（供 /__status 排查）
+  const sources = {};
   for (const r of results) {
     if (r.status === 'fulfilled') {
+      sources[r.value.name] = { ok: true, wrote: r.value.count };
       console.log(`[TASK] EPG ${r.value.name}: wrote ${r.value.count} files`);
     } else {
+      sources[r.value.name] = { ok: false, error: r.reason?.message || String(r.reason) };
       console.error(`[TASK] EPG failed: ${r.reason?.message || r.reason}`);
     }
   }
+  const meta = {
+    last_run: new Date().toISOString(),
+    sources,
+  };
+  await env.EPG_BUCKET.put('_meta/last-run.json', JSON.stringify(meta, null, 2), {
+    httpMetadata: { contentType: 'application/json' },
+  }).catch((e) => console.error('[TASK] meta write failed:', e.message));
 }
 
 // ---------- HTTP 入口 ----------
@@ -210,6 +221,14 @@ async function handleRequest(request, env) {
   const url = new URL(request.url);
   // URL.pathname 是百分号编码的，中文频道名必须解码后才能匹配 R2 key
   const pathname = decodeURIComponent(url.pathname);
+
+  // 状态端点：查看最近 cron 运行情况（排查用）
+  if (pathname === '/__status') {
+    const meta = await env.EPG_BUCKET.get('_meta/last-run.json');
+    if (!meta) return new Response(JSON.stringify({ last_run: null, note: 'cron 尚未运行' }), { headers: jsonHeaders() });
+    return new Response(meta.body, { headers: jsonHeaders() });
+  }
+
   const m = pathname.match(/^\/epg\/([^/]+)\/(\d{4}-\d{2}-\d{2})\/(.+)\.json$/);
   if (!m) {
     return new Response('Not Found', { status: 404 });
