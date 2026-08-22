@@ -24,7 +24,7 @@ const EPG_ALIASES = {
 };
 
 const DIYP_API = 'http://epg.51zmt.top:8000/api/diyp/';
-const FETCH_TIMEOUT_MS = 60000; // 上游 XML 抓取超时
+const FETCH_TIMEOUT_MS = 120000; // 上游 XML 抓取超时（CF 边缘访问 GitHub Pages 通常数秒，放宽到 120s 防抖动）
 const DIYP_TIMEOUT_MS = 10000; // DIYP 兜底超时
 const CACHE_TTL = 'public, max-age=3600'; // 1 小时缓存
 
